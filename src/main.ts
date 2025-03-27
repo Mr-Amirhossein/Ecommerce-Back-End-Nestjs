@@ -1,11 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  // app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix('api');
   // app.useGlobalPipes(new ValidationPipe({ whitelist: true })); // to remove all non-whitelist propertise
+
   const config = new DocumentBuilder()
     .setTitle('Ecommerce API') // corrected title spelling
     .setDescription('The Ecommerce API description') // corrected description spelling

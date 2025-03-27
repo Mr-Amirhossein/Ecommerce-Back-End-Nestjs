@@ -43,7 +43,7 @@ export class User {
   active: boolean;
 
   @Prop({ type: String })
-  vrificationCode: string;
+  verificationCode: string;
 
   @Prop({ type: String, enum: ['male', 'female', 'other'] })
   gender: string;
