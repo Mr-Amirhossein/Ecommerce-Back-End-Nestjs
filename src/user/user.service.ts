@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -15,6 +15,8 @@ export class UserService {
     @InjectModel(User.name) private userModel: Model<User>,
     private jwtService: JwtService,
   ) {}
+
+  // For Admin
   async create(
     createUserDto: CreateUserDto,
   ): Promise<{ status: number; message: string; data: User }> {
@@ -46,12 +48,41 @@ export class UserService {
   }
 
   //Pagination
-  async findAll(): Promise<{ status: number; message: string; data: User[] }> {
+  async findAll(query) {
+    const { limit = 1000_000_000, skip = 0, sort, name, email, role } = query;
+
+    // or=> کجاست همراه  با تمام فیلد ها جستجو
+    //  rege=> جستجو با هر کدام از فیلد ها
+    const users = await this.userModel
+      .find()
+      .skip(skip)
+      .limit(limit)
+      .where('name', new RegExp(name, 'i'))
+      .where('email', new RegExp(email, 'i'))
+      .where('role', new RegExp(role, 'i'))
+      .where('active', true)
+      .sort({ name: sort })
+      .select('-password -__v');
+
+    if (Number.isNaN(Number(limit))) {
+      throw new HttpException('مقدار limit باید عدد باشد.', 400);
+    }
+
+    if (Number.isNaN(Number(skip))) {
+      throw new HttpException('مقدار skip باید عدد باشد.', 400);
+    }
+
+    if (!['asc', 'desc'].includes(sort)) {
+      throw new HttpException('مقدار sort باید asc یا desc باشد.', 400);
+    }
+
     // برگرداندن تمامی کاربران
+
     return {
       status: 200,
       message: 'کاربران با موفقیت برگردانده شدند.',
-      data: await this.userModel.find().select('-password -__v'),
+      length: users.length,
+      data: users,
     };
   }
 
@@ -118,5 +149,87 @@ export class UserService {
       status: 200,
       message: 'کاربر با موفقیت حذف شد.',
     };
+  }
+
+  //======================================= For User ===========================================
+
+  // @docs User Can Get data
+  async getMe(
+    payload,
+  ): Promise<{ status: number; message: string; data: User }> {
+    if (!payload.id) {
+      throw new NotFoundException('کاربری با این مشخصات وجود ندارد.');
+    }
+
+    const user = await this.userModel
+      .findById(payload.id)
+      .select('-password -__v');
+    // چک کردن اینکه کاربر وجود داشته باشد.
+    if (!user) {
+      throw new NotFoundException('کاربری با این مشخصات وجود ندارد.');
+    }
+    // برگرداندن یک کاربر با استفاده از شناسه
+    return {
+      status: 200,
+      message: 'کاربر با موفقیت برگردانده شد.',
+      data: user,
+    };
+  }
+
+  // @docs User Can Update data
+  async updateMe(
+    payload,
+    updateUserDto: UpdateUserDto,
+  ): Promise<{ status: number; message: string; data: User }> {
+    const user = await this.userModel.findById(payload.id);
+    // چک کردن اینکه کاربر وجود داشته باشد
+    if (!user) {
+      throw new NotFoundException('کاربری با این مشخصات وجود ندارد.');
+    }
+    let userData = { ...updateUserDto };
+
+    if (updateUserDto.password) {
+      const password = await bcrypt.hash(updateUserDto.password, saltRounds);
+      userData = {
+        ...userData,
+        password,
+      };
+    }
+    // برگرداندن پیام و کاربر به روز شده
+    const updatedUser = await this.userModel
+      .findByIdAndUpdate(payload.id, userData, {
+        new: true,
+      })
+      .select('-password -__v');
+
+    if (!updatedUser) {
+      throw new NotFoundException('به روزرسانی کاربر با خطا مواجه شد.');
+    }
+
+    return {
+      status: 200,
+      message: 'کاربر با موفقیت به روز رسانی شد.',
+      data: updatedUser,
+    };
+  }
+
+  // @docs Any User Can unActive your account
+  async deleteMe(payload): Promise<void> {
+    if (!payload.id) {
+      throw new NotFoundException('کاربری با این مشخصات وجود ندارد.');
+    }
+    // چک کردن اینکه کاربر وجود داشته باشد
+    const user = await this.userModel
+      .findById(payload.id)
+      .select('-password -__v');
+
+    if (!user) {
+      throw new NotFoundException('کاربری با این مشخصات وجود ندارد.');
+    }
+    await this.userModel.findByIdAndUpdate(
+      payload.id,
+      { active: false },
+      { new: true },
+    );
   }
 }
