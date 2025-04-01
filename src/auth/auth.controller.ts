@@ -1,18 +1,15 @@
 import { Body, Controller, Post, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import {
-  SignInDto,
-  SignInResponseDto,
-  SignUpDto,
-  SignUpResponseDto,
-} from './Dto/auth.dto';
-import {
-  ApiOkResponse,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ResetPasswordDto, SignInDto, SignUpDto } from './Dto/auth.dto';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import {
+  ResetPasswordResponseDto,
+  SignInResponseDto,
+  SignUpResponseDto,
+  VirifyCodeResponseDto,
+  ChangePasswordResponseDto,
+} from './Dto/auth-response.dto';
 
 @Controller('v1/auth')
 @ApiTags('Auth')
@@ -59,4 +56,72 @@ export class AuthController {
   ) {
     return await this.authService.signIn(signInDto);
   }
+
+  // @docs Reset Password
+  // @Route Post /api/v1/auth/reset-password
+  // @Access public
+  @ApiOperation({ summary: 'بازیابی رمز عبور' })
+  @ApiOkResponse({
+    type: ResetPasswordResponseDto,
+    description: 'رمز عبور با موفقیت بازیابی شد.',
+  })
+  @Post('reset-password')
+  async resetPassword(
+    @Body(
+      new ValidationPipe({
+        forbidNonWhitelisted: true,
+      }),
+    )
+    email: ResetPasswordDto,
+  ) {
+    return await this.authService.resetPassword(email);
+  }
+
+  // @docs Verify Code
+  // @Route Post /api/v1/auth/verify-code
+  // @Access public
+  @ApiOperation({ summary: 'تایید کد بازیابی' })
+  @ApiOkResponse({
+    type: VirifyCodeResponseDto,
+    description: 'کد بازیابی با موفقیت تایید شد.',
+  })
+  @Post('virify-code')
+  async virifyCode(
+    @Body(
+      new ValidationPipe({
+        forbidNonWhitelisted: true,
+      }),
+    )
+    virifyCode: {
+      email: string;
+      code: string;
+    },
+  ) {
+    return await this.authService.virifyCode(virifyCode);
+  }
+
+  // @docs Change Password
+  // @Route Post /api/v1/auth/change-password
+  // @Access private For users => [user, admin]
+  @ApiOperation({ summary: 'تغییر رمز عبور' })
+  @ApiOkResponse({
+    type: ChangePasswordResponseDto,
+    description: 'رمز عبور با موفقیت تغییر کرد.',
+  })
+  @Post('change-password')
+  async changePassword(
+    @Body(
+      new ValidationPipe({
+        forbidNonWhitelisted: true,
+      }),
+    )
+    changePasswordData: SignInDto,
+  ) {
+    return await this.authService.changePassword(changePasswordData);
+  }
+  /*
+ 1: / Reset Password
+ 2: / Verify Code
+ 3: / Change Password
+ */
 }
