@@ -119,9 +119,4 @@ export class AuthController {
   ) {
     return await this.authService.changePassword(changePasswordData);
   }
-  /*
- 1: / Reset Password
- 2: / Verify Code
- 3: / Change Password
- */
 }

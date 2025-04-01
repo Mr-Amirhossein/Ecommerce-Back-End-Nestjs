@@ -42,7 +42,7 @@ export class UserController {
   @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'ایجاد کاربر جدید بدست ادمین' })
   @ApiCreatedResponse({
-    type: [CreateUserDto],
+    type: CreateUserDto,
     description: 'کاربر با موفقیت ایجاد شد.',
   })
   create(
