@@ -63,7 +63,7 @@ export class AuthService {
       .findOne({
         email: signInDto.email,
       })
-      .select('-__v');
+      .select('name email password role active');
     if (!user) {
       throw new HttpException('کاربر پیدا نشد', 400);
     }
