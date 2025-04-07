@@ -15,6 +15,7 @@ import { UpdateCouponDto } from './dto/update-coupon.dto';
 import { Roles } from 'src/user/decorator/Role.decorator';
 import { AuthGuard } from 'src/auth/guards/Auth.guard';
 import {
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
@@ -29,9 +30,10 @@ export class CouponController {
   // docs Admin Can Create a Coupon
   // Route Post /api/v1/coupon/create
   // Access private [admin]
-  @Post('create')
   @Roles(['admin'])
   @UseGuards(AuthGuard)
+  @Post('create')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'ایجاد کوپن جدید بدست ادمین' })
   @ApiCreatedResponse({
     type: CreateCouponDto,
@@ -51,9 +53,10 @@ export class CouponController {
   // docs Admin Can Get All Coupons
   // Route Get /api/v1/coupon/all
   // Access private [admin]
-  @Get('all')
   @Roles(['admin'])
   @UseGuards(AuthGuard)
+  @Get('all')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'دریافت همه کوپن ها' })
   @ApiOkResponse({
     type: [CreateCouponDto],
@@ -66,9 +69,10 @@ export class CouponController {
   // docs Admin Can Get One Coupon
   // Route Get /api/v1/coupon/:id
   // Access private [admin]
-  @Get('single/:id')
   @Roles(['admin'])
   @UseGuards(AuthGuard)
+  @Get('single/:id')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'دریافت یک کوپن' })
   @ApiOkResponse({
     type: CreateCouponDto,
@@ -81,9 +85,10 @@ export class CouponController {
   // docs Admin Can Update Coupon
   // Route Put /api/v1/coupon/update/:id
   // Access private [admin]
-  @Put('update/:id')
   @Roles(['admin'])
   @UseGuards(AuthGuard)
+  @Put('update/:id')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'به روز رسانی کوپن بدست ادمین' })
   @ApiOkResponse({
     type: UpdateCouponDto,
@@ -104,9 +109,10 @@ export class CouponController {
   // docs Admin Can Delete Coupon
   // Route Delete /api/v1/coupon/delete/:id
   // Access private [admin]
-  @Delete('delete/:id')
   @Roles(['admin'])
   @UseGuards(AuthGuard)
+  @Delete('delete/:id')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'حذف کوپن بدست ادمین' })
   @ApiOkResponse({
     description: 'کوپن با موفقیت حذف شد.',

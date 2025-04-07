@@ -8,14 +8,18 @@ import {
   UseGuards,
   ValidationPipe,
   Put,
-  Query,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Roles } from 'src/user/decorator/Role.decorator';
 import { AuthGuard } from 'src/auth/guards/Auth.guard';
-import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import {
   DeleteCategoryResponseDto,
   GetAllCategoresResponseDto,
@@ -31,9 +35,10 @@ export class CategoryController {
   // docs Admin Can Create a Category
   // Route Post /api/v1/category/create
   // Access private [admin]
-  @Post('create')
   @Roles(['admin'])
   @UseGuards(AuthGuard)
+  @Post('create')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'ایجاد دسته جدید بدست ادمین' })
   @ApiCreatedResponse({
     type: CreateCategoryDto,
@@ -80,9 +85,10 @@ export class CategoryController {
   // Route Patch /api/v1/category/update/:id
   // Access private [admin]
 
-  @Put('update/:id')
   @Roles(['admin'])
   @UseGuards(AuthGuard)
+  @Put('update/:id')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'به روز رسانی دسته با شناسه مشخص بدست ادمین' })
   @ApiCreatedResponse({
     type: UpdateCategoryResponseDto,
@@ -98,9 +104,10 @@ export class CategoryController {
   // docs Admin Can Delete a Category
   // Route Delete /api/v1/category/remove/:id
   // Access private [admin]
-  @Delete('remove/:id')
   @Roles(['admin'])
   @UseGuards(AuthGuard)
+  @Delete('remove/:id')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'حذف دسته با شناسه مشخص بدست ادمین' })
   @ApiCreatedResponse({
     type: DeleteCategoryResponseDto,

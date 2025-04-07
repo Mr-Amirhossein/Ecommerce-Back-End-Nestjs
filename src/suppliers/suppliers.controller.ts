@@ -15,6 +15,7 @@ import { UpdateSupplierDto } from './dto/update-supplier.dto';
 import { Roles } from 'src/user/decorator/Role.decorator';
 import { AuthGuard } from 'src/auth/guards/Auth.guard';
 import {
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
@@ -29,9 +30,10 @@ export class SuppliersController {
   // docs Admin Can Create a Supplier
   // Route Post /api/v1/suppliers/create
   // Access private [admin]
-  @Post('create')
   @Roles(['admin'])
   @UseGuards(AuthGuard)
+  @Post('create')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'ایجاد یک تامین کننده' })
   @ApiCreatedResponse({
     type: CreateSupplierDto,
@@ -52,6 +54,7 @@ export class SuppliersController {
   // Route Get /api/v1/suppliers/all
   // Access public
   @Get('all')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'دریافت لیست تامین کنندگان' })
   @ApiOkResponse({
     type: [CreateSupplierDto],
@@ -66,6 +69,7 @@ export class SuppliersController {
   // Route Get /api/v1/suppliers/single/:id
   // Access public
   @Get('single/:id')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'دریافت یک تامین کننده' })
   @ApiOkResponse({
     type: CreateSupplierDto,
@@ -78,9 +82,10 @@ export class SuppliersController {
   // docs Admin Can Update Supplier
   // Route Put /api/v1/suppliers/update/:id
   // Access private [admin]
-  @Put('update/:id')
   @Roles(['admin'])
   @UseGuards(AuthGuard)
+  @Put('update/:id')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'به روز رسانی تامین کننده' })
   @ApiCreatedResponse({
     type: UpdateSupplierDto,
@@ -101,9 +106,10 @@ export class SuppliersController {
   // docs Admin Can Delete Supplier
   // Route Delete /api/v1/suppliers/delete/:id
   // Access private [admin]
-  @Delete('delete/:id')
   @Roles(['admin'])
   @UseGuards(AuthGuard)
+  @Delete('delete/:id')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'حذف تامین کننده' })
   @ApiOkResponse({
     description: 'تامین کننده با موفقیت حذف شد.',

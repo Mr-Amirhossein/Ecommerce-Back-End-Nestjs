@@ -12,6 +12,7 @@ import {
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
 import {
+  ApiBearerAuth,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
@@ -33,9 +34,10 @@ export class BrandController {
   // docs Admin Can Create a Brand
   // Route Post /api/v1/brand/create
   // Access private [admin]
-  @Post('create')
   @Roles(['admin'])
   @UseGuards(AuthGuard)
+  @Post('create')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'ایجاد برند جدید بدست ادمین' })
   @ApiCreatedResponse({
     type: CreateBrandDto,
@@ -82,9 +84,10 @@ export class BrandController {
   // docs Admin Can Update Brand
   // Route Put /api/v1/brand/update/:id
   // Access private [admin]
-  @Put('update/:id')
   @Roles(['admin'])
   @UseGuards(AuthGuard)
+  @Put('update/:id')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'به روز رسانی برند' })
   @ApiCreatedResponse({
     type: UpdateBrandResponseDto,
@@ -105,9 +108,10 @@ export class BrandController {
   // docs Admin Can Delete Brand
   // Route Delete /api/v1/brand/delete/:id
   // Access private [admin]
-  @Delete('delete/:id')
   @Roles(['admin'])
   @UseGuards(AuthGuard)
+  @Delete('delete/:id')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'حذف برند' })
   @ApiCreatedResponse({
     type: String,

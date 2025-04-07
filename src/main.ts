@@ -9,8 +9,8 @@ async function bootstrap() {
   // app.useGlobalPipes(new ValidationPipe({ whitelist: true })); // to remove all non-whitelist propertise
 
   const config = new DocumentBuilder()
-    .setTitle('Ecommerce API') // corrected title spelling
-    .setDescription('The Ecommerce API description') // corrected description spelling
+    .setTitle('API فروشگاه اینترنتی') // corrected title spelling
+    .setDescription(' توضیحات فروشگاه اینترنتی') // corrected description spelling
     .setVersion('0.1') // corrected version number format
     .addBearerAuth()
     .build();

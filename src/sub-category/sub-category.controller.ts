@@ -12,7 +12,12 @@ import {
 import { SubCategoryService } from './sub-category.service';
 import { CreateSubCategoryDto } from './dto/create-sub-category.dto';
 import { UpdateSubCategoryDto } from './dto/update-sub-category.dto';
-import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Roles } from 'src/user/decorator/Role.decorator';
 import { AuthGuard } from 'src/auth/guards/Auth.guard';
 import {
@@ -30,9 +35,10 @@ export class SubCategoryController {
   // docs Admin Can Create a SubCategory
   // Route Post /api/v1/sub-category/create
   // Access private [admin]
-  @Post('create')
   @Roles(['admin'])
   @UseGuards(AuthGuard)
+  @Post('create')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'ایجاد زیر دسته جدید بدست ادمین' })
   @ApiCreatedResponse({
     type: CreateSubCategoryDto,
@@ -78,9 +84,10 @@ export class SubCategoryController {
   // docs Admin Can Update SubCategory by ID
   // Route Put /api/v1/sub-category/update/:id
   // Access private [admin]
-  @Put('update/:id')
   @Roles(['admin'])
   @UseGuards(AuthGuard)
+  @Put('update/:id')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'به روز رسانی زیر دسته با شناسه مشخص' })
   @ApiCreatedResponse({
     type: UpdateSubCategoryResponseDto,
@@ -96,9 +103,10 @@ export class SubCategoryController {
   // docs Admin Can Delete SubCategory by ID
   // Route Delete /api/v1/sub-category/delete/:id
   // Access private [admin]
-  @Delete('delete/:id')
   @Roles(['admin'])
   @UseGuards(AuthGuard)
+  @Delete('delete/:id')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'حذف زیر دسته با شناسه مشخص' })
   @ApiCreatedResponse({
     type: DeleteSubCategoryResponseDto,

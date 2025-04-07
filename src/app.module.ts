@@ -11,6 +11,10 @@ import { SubCategoryModule } from './sub-category/sub-category.module';
 import { BrandModule } from './brand/brand.module';
 import { CouponModule } from './coupon/coupon.module';
 import { SuppliersModule } from './suppliers/suppliers.module';
+import { ProductModule } from './product/product.module';
+import { RequestProductModule } from './request-product/request-product.module';
+import { TaxModule } from './tax/tax.module';
+import { ReviewModule } from './review/review.module';
 
 @Module({
   imports: [
@@ -18,13 +22,13 @@ import { SuppliersModule } from './suppliers/suppliers.module';
     MongooseModule.forRoot(
       'mongodb://root:9kvixZkHtvf9V2Pz4tAfAkzy@alvand.liara.cloud:30112/ecommerce?authSource=admin',
     ),
+    AuthModule,
     UserModule,
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '60m' },
     }),
-    AuthModule,
     MailerModule.forRoot({
       transport: {
         service: 'gmail',
@@ -34,11 +38,15 @@ import { SuppliersModule } from './suppliers/suppliers.module';
         },
       },
     }),
-    // CategoryModule,
-    // SubCategoryModule,
-    // BrandModule,
+    ProductModule,
+    CategoryModule,
+    SubCategoryModule,
+    BrandModule,
     CouponModule,
     SuppliersModule,
+    RequestProductModule,
+    TaxModule,
+    ReviewModule,
   ],
   controllers: [],
   providers: [],
