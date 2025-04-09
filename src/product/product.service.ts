@@ -51,9 +51,9 @@ export class ProductService {
 
     let sort = query?.sort || 'title';
     sort = sort.split(',').join(' ');
-    if(!['asc','desc'].includes(sort)){
-     throw new HttpException('فقط می توانید از sort:asc و sort:desc استفاده کنید', 400)
-    }
+    // if(!['asc','desc'].includes(sort)){
+    //  throw new HttpException('فقط می توانید از sort:asc و sort:desc استفاده کنید', 400)
+    // }
    
     let fields = query?.fields || '';
     fields = fields.split(',').join(' ');
@@ -70,7 +70,7 @@ export class ProductService {
     if(query.category) {
       findData.category = query.category.toString();
     }
-    const products = await this.productModel.find().limit(limit).skip(skip).sort({title:sort}).select(fields);
+    const products = await this.productModel.find().limit(limit).skip(skip).sort(sort).select(fields);
 
     if (!products) {
       throw new NotFoundException('محصولی یافت نشد');
