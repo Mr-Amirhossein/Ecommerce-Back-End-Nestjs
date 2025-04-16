@@ -4,20 +4,32 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product } from './product.schema';
 import { Model } from 'mongoose';
+import { Category } from 'src/category/category.schema';
+import { SubCategory } from 'src/sub-category/sub-category.schema.';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectModel(Product.name) private readonly productModel: Model<Product>,
+    @InjectModel(Category.name) private readonly categoryModel: Model<Category>,
+    @InjectModel(SubCategory.name) private readonly subCategoryModel: Model<SubCategory>,
   ) {}
   async create(createProductDto: CreateProductDto) {
     const product = await this.productModel.findOne({
       title: createProductDto.title,
     }).select('-__v ');
 
-    const category = await this.productModel.findById({
+    const category = await this.categoryModel.findById({
       _id: createProductDto.category,
     }).select('-__v');
+    
+    const subCategory = await this.subCategoryModel.findById({
+      _id: createProductDto.subCategory,
+    }).select('-__v');
+    
+    if (!subCategory) {
+      throw new NotFoundException('زیر دسته بندی یافت نشد');
+    }
     if (!category) {
       throw new NotFoundException('دسته بندی یافت نشد');
     }

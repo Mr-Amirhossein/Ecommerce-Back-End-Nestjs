@@ -81,7 +81,6 @@ export class CreateProductDto {
 
     @IsOptional()
     @IsString({ message: 'زیر دسته بندی محصول باید یک رشته باشد' })
-    @IsNotEmpty({ message: 'زیر دسته بندی محصول نمی تواند خالی باشد' })
     @ApiProperty({ example: 'زیر دسته بندی محصول',
         description: 'زیر دسته بندی محصول نمی تواند خالی باشد و به صورت پیش فرض عمومی در نظر گرفته می شود'
     })

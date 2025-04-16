@@ -107,7 +107,7 @@ async findOne(user_id: string) {
        {new:true}
     ).select('-__v'))
 
-    const reviewOnSingleProduct = await this.reviewModel.find({ product: updateReviewDto.product }).select('rating')
+    const reviewOnSingleProduct = await this.reviewModel.find({ product: review.product }).select('rating')
 
     const ratingsQuantity = reviewOnSingleProduct.length
     if (ratingsQuantity > 0) {
@@ -117,7 +117,7 @@ async findOne(user_id: string) {
       }
     
   
-    const ratingsAverage :number= totalAverage / ratingsQuantity
+    const ratingsAverage = totalAverage / ratingsQuantity
     
      await this.productModel.findByIdAndUpdate(review.product, {
       ratingsAverage,
@@ -140,34 +140,41 @@ async findOne(user_id: string) {
     if (review.user.toString() !== user_id.toString()) {
       throw new UnauthorizedException('شما مجاز به حذف این review نیستید');
     }
+    
+    // First delete the review
     await this.reviewModel.findByIdAndDelete(id);
-
-    const reviewOnSingleProduct = await this.reviewModel.find({ product: review.product })
-      .select('rating')
-
+    
+    // Then get the updated review list excluding the deleted one
+    const reviewOnSingleProduct = await this.reviewModel.find({ product: review.product }).select('rating')
+    
     const ratingsQuantity = reviewOnSingleProduct.length
-    let totalAverage: number = 0;
-    for (let i = 0; i < reviewOnSingleProduct.length; i++) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      totalAverage += reviewOnSingleProduct[i].rating;
+    
+    if(ratingsQuantity > 0){
+      let totalAverage: number = 0;
+      for (let i = 0; i < reviewOnSingleProduct.length; i++) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        totalAverage += reviewOnSingleProduct[i].rating;
+      }
+      
+      const ratingsAverage = totalAverage / ratingsQuantity;
+      
+      await this.productModel.findByIdAndUpdate(review.product, {
+        ratingsAverage,
+        ratingsQuantity,
+      });
+    } else {
+      // If there are no more reviews, reset ratings to 0
+      await this.productModel.findByIdAndUpdate(review.product, {
+        ratingsAverage: 0,
+        ratingsQuantity: 0,
+      });
     }
-
-
-    const ratingsAverage = totalAverage / ratingsQuantity;
-
-
-    await this.productModel.findByIdAndUpdate(review.product, {
-      ratingsAverage,
-      ratingsQuantity,
-    });
-
-console.log();
-
-    return{
+    
+    return {
       status: 200,
       message: 'review با موفقیت حذف شد',
       deletedReview: review,
-    };
+      }
   }
 }
 

@@ -93,7 +93,7 @@ export class Product {
   @ApiProperty({ example: 'قیمت با احتساب تخفیف',
     description: 'قیمت با احتساب تخفیف می تواند خالی باشد و در صورت خالی بودن به صورت پیش فرض قیمت اصلی در نظر گرفته می شود'
    })
-  PriceAfterDiscount:number
+  priceAfterDiscount:number
 
   @Prop({
     required: false,

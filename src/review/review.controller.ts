@@ -33,7 +33,7 @@ export class ReviewController {
   // docs User Can Create a Review
   // Route Post /api/v1/review/create
   // Access private [user]
-  @Roles(['admin'])
+  @Roles(['user'])
   @UseGuards(AuthGuard)
   @Post('create')
   @ApiBearerAuth()
