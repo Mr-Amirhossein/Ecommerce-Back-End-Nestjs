@@ -92,7 +92,15 @@ export class CartService {
   }
 
   async findAll() {
-    return `This action returns all cart`;
+    const carts = await this.cartModel.find().populate('cartItems.productId', 'title price quantity priceAfterDiscount _id').select('-__v');
+    if (!carts) {
+      throw new NotFoundException('سبد خرید یافت نشد');
+    }
+    return {
+      statusCode: 200,
+      message: 'سبد خرید با موفقیت دریافت شد',
+      carts: carts,
+    };
   }
 
 
@@ -259,4 +267,19 @@ export class CartService {
       cart: cart
   }
 }
+
+  async findAllForAdmin(){
+    const carts = await this.cartModel.find()
+    .populate('cartItems.productId', 'title price description priceAfterDiscount _id')
+    .select('-__v')
+    if (!carts) {
+      throw new NotFoundException('سبد خرید یافت نشد');
+    }
+    return {
+      statusCode: 200,
+      message: 'سبد خرید ها با موفقیت دریافت شد',
+      length: carts.length,
+      carts: carts,
+    };
+  }
 }

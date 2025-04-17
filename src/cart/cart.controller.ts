@@ -117,7 +117,7 @@ export class CartController {
 
   // ========================== For Admin ============================== //
 
-  // docs Get All Cart
+  // docs Admin Can Get All Cart of User
   // Route Get /api/v1/cart
   // Access private [admin]
   @Roles(['admin'])
@@ -133,4 +133,19 @@ export class CartController {
     return await this.cartService.findOne(userId);
   }
 
+  // docs Get All Cart
+  // Route Get /api/v1/cart
+  // Access private [admin]
+  @Roles(['admin'])
+  @UseGuards(AuthGuard)
+  @Get('admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'دریافت همه سبد خریدها' })
+  @ApiOkResponse({
+    type: CreateCartDto,
+    description: 'سبد خریدها با موفقیت دریافت شد.',
+  })
+  async findAllForAdmin() {
+    return await this.cartService.findAllForAdmin();
+  }
 }

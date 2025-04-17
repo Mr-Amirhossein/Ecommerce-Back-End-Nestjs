@@ -16,6 +16,7 @@ import { RequestProductModule } from './request-product/request-product.module';
 import { TaxModule } from './tax/tax.module';
 import { ReviewModule } from './review/review.module';
 import { CartModule } from './cart/cart.module';
+import { CartAdminModule } from './cart-admin/cart-admin.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { CartModule } from './cart/cart.module';
     TaxModule,
     ReviewModule,
     CartModule,
+    // CartAdminModule,
   ],
   controllers: [],
   providers: [],
