@@ -70,8 +70,8 @@ export class UserController {
     type: GetUsersResponseDto,
     description: 'لیست کاربران با موفقیت برگردانده شد.',
   })
-  async findAll(@Query() query) {
-    return await this.userService.findAll(query);
+  async findAll() {
+    return await this.userService.findAll();
   }
 
   // @docs Admin Can Get Single  Users

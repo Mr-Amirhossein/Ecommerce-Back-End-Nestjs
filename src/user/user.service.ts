@@ -48,36 +48,39 @@ export class UserService {
   }
 
   //Pagination
-  async findAll(query) {
-    const { limit = 1000_000_000, skip = 0, sort, name, email, role } = query;
+  async findAll() {
+    // const { limit = 1000_000_000, skip = 0, sort, name, email, role } = query;
 
-    // or=> کجاست همراه  با تمام فیلد ها جستجو
-    //  rege=> جستجو با هر کدام از فیلد ها
+    // // or=> کجاست همراه  با تمام فیلد ها جستجو
+    // //  rege=> جستجو با هر کدام از فیلد ها
+    // const users = await this.userModel
+    //   .find()
+    //   .skip(skip)
+    //   .limit(limit)
+    //   .where('name', new RegExp(name, 'i'))
+    //   .where('email', new RegExp(email, 'i'))
+    //   .where('role', new RegExp(role, 'i'))
+    //   .where('active', true)
+    //   .sort({ name: sort })
+    //   .select('-password -__v');
+
+    // if (Number.isNaN(Number(limit))) {
+    //   throw new HttpException('مقدار limit باید عدد باشد.', 400);
+    // }
+
+    // if (Number.isNaN(Number(skip))) {
+    //   throw new HttpException('مقدار skip باید عدد باشد.', 400);
+    // }
+
+    // if (!['asc', 'desc'].includes(sort)) {
+    //   throw new HttpException('مقدار sort باید asc یا desc باشد.', 400);
+    // }
+
+    // // برگرداندن تمامی کاربران
+
     const users = await this.userModel
       .find()
-      .skip(skip)
-      .limit(limit)
-      .where('name', new RegExp(name, 'i'))
-      .where('email', new RegExp(email, 'i'))
-      .where('role', new RegExp(role, 'i'))
-      .where('active', true)
-      .sort({ name: sort })
-      .select('-password -__v');
-
-    if (Number.isNaN(Number(limit))) {
-      throw new HttpException('مقدار limit باید عدد باشد.', 400);
-    }
-
-    if (Number.isNaN(Number(skip))) {
-      throw new HttpException('مقدار skip باید عدد باشد.', 400);
-    }
-
-    if (!['asc', 'desc'].includes(sort)) {
-      throw new HttpException('مقدار sort باید asc یا desc باشد.', 400);
-    }
-
-    // برگرداندن تمامی کاربران
-
+      .select('-__v');
     return {
       status: 200,
       message: 'کاربران با موفقیت برگردانده شدند.',

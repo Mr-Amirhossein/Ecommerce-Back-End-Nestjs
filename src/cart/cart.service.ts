@@ -242,4 +242,21 @@ export class CartService {
       cart: cart,
     }
   }
+
+  // ======================= for admin ==========================
+
+  async findOneForAdmin (userId:string){
+    const cart = await this.cartModel.findOne({ user: userId })
+    .populate('cartItems.productId', 'title price description priceAfterDiscount _id')
+    .select('-__v')
+
+    if (!cart) {
+      throw new NotFoundException('سبد خرید یافت نشد');
+    }
+    return{
+      statusCode: 200,
+      message: 'سبد خرید با موفقیت دریافت شد',
+      cart: cart
+  }
+}
 }

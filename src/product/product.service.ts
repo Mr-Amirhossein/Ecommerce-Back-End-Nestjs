@@ -36,6 +36,12 @@ export class ProductService {
     if (product) {
        throw new HttpException('این محصول قبلا ایجاد شده است', 400,)
     }
+
+    const priceAfterDiscount = createProductDto?.priceAfterDiscount || 0;
+    if (createProductDto.price < priceAfterDiscount) {
+      throw new HttpException('قیمت بعد از تخفیف نمی تواند بیشتر از قیمت اصلی باشد', 400)}
+
+
     const newProduct = await( await this.productModel.create(createProductDto)).populate('category subCategory brand','-__v');
 
     return{
@@ -141,6 +147,15 @@ export class ProductService {
     if(updateProductDto.sold !== undefined && product.quantity < updateProductDto.sold){
       throw new HttpException('تعداد فروش بیشتر از موجودی است', 400)
     }
+
+    const priceAfterDiscount = updateProductDto?.priceAfterDiscount || product.priceAfterDiscount;
+    const price = updateProductDto?.price || product.price;
+
+    if (price < priceAfterDiscount) {
+      throw new HttpException('قیمت بعد از تخفیف نمی تواند بیشتر از قیمت اصلی باشد', 400)
+    }
+
+
 
     const updatedProduct = await this.productModel.findByIdAndUpdate(
       id,

@@ -33,21 +33,6 @@ export class CartController {
   return await this.cartService.create(productId, userId);
   }
 
-  // docs Get All Cart
-  // Route Get /api/v1/cart
-  // Access private [admin]
-  @Roles(['admin'])
-  @UseGuards(AuthGuard)
-  @Get('all')
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'دریافت همه سبد خریدها' })
-  @ApiOkResponse({
-    type: CreateCartDto,
-    description: 'سبد خریدها با موفقیت دریافت شد.',
-  })
-  async findAll() {
-    return await this.cartService.findAll();
-  }
 
   //  @docs   Can Only User Apply Coupons
   //  @Route  POST /api/v1/cart/coupon
@@ -127,6 +112,25 @@ export class CartController {
     const userId = req.user.id; // Assuming the user ID is stored in req.user._id
     return await this.cartService.remove(productId , userId);
 
+  }
+
+
+  // ========================== For Admin ============================== //
+
+  // docs Get All Cart
+  // Route Get /api/v1/cart
+  // Access private [admin]
+  @Roles(['admin'])
+  @UseGuards(AuthGuard)
+  @Get('admin/:userId')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'دریافت همه سبد خریدها' })
+  @ApiOkResponse({
+    type: CreateCartDto,
+    description: 'سبد خریدها با موفقیت دریافت شد.',
+  })
+  async findOneForAdmin(@Param('userId') userId: string) {
+    return await this.cartService.findOne(userId);
   }
 
 }
