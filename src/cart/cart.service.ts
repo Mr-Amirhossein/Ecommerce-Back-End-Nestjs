@@ -14,9 +14,9 @@ export class CartService {
     @InjectModel(Product.name) private productModel: Model<Product>,
     @InjectModel(Coupon.name) private couponModel: Model<Coupon>,
   ) {}
-  async create(productId: string, userId: string) {
+  async create(productId: string, userId: string, isElse?: boolean) {
 
-    const cart = await this.cartModel.findOne({ user: userId }).populate('cartItems.productId', 'title price quantity priceAfterDiscount _id');
+    const cart = await this.cartModel.findOne({ user: userId }).populate('cartItems.productId', 'title price  priceAfterDiscount _id');
     const product = await this.productModel.findById(productId);
     
     if (!product) {
@@ -27,67 +27,66 @@ export class CartService {
       throw new HttpException('محصول موجود نیست', 404);
     }
 
+    
     if (cart) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      let ifProductAlredyInsert:{
-        ifAdd: boolean;
-        indexProduct: number;
-      } = {
-        ifAdd: false,
-        indexProduct: 0,
-      };
+      // add first product=> insert product in cart
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      let totalPriceCartBeforAdd = 0;
-      cart.cartItems.map((item, index) => {
-        if (item.productId._id.toString() === productId.toString()) {
-          ifProductAlredyInsert ={
-            ifAdd: true,
-            indexProduct: index
-          }
-          totalPriceCartBeforAdd += item.productId.price * item.quantity - item.productId.priceAfterDiscount;
-        }});
-        
-        const cloneCartItems = cart.cartItems
-      if (ifProductAlredyInsert.ifAdd) {
-        cloneCartItems[ifProductAlredyInsert.indexProduct].quantity += 1;
+      const indexIfProductAlridyInsert = cart.cartItems.findIndex(
+        // -1 not found
+        (item) => item.productId._id.toString() === productId.toString(),
+      );
+
+      if (indexIfProductAlridyInsert !== -1) {
+        cart.cartItems[indexIfProductAlridyInsert].quantity += 1;
       } else {
         // eslint-disable-next-line
         // @ts-ignore
-        cloneCartItems.push({ productId: productId, quantity: 1, color: '' });
-
+        cart.cartItems.push({ productId: productId, color: '', quantity: 1 });
       }
-      const updateCartAndAddProduct = await this.cartModel.findOneAndUpdate(
-        { user: userId },
-        {
-          cartItems: cloneCartItems,
-          totalPrice: cart.totalPrice + product.price - product.priceAfterDiscount,
-        },
-        { new: true },
-      ).populate('cartItems.productId', 'title description price  priceAfterDiscount _id');
 
+      await cart.populate('cartItems.productId', 'title price quantity priceAfterDiscount');
+
+
+      if (cart.cartItems[0].quantity > product.quantity) {
+        throw new HttpException('تعداد محصول باید کمتر یا مساوی  موجودی باشد', 400);
+      }
+
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      let totalPriceAfterInsert = 0;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      let totalDiscountPriceAfterInsert = 0;
+
+      cart.cartItems.map((item) => {
+        totalPriceAfterInsert += item.quantity * item.productId.price;
+        totalDiscountPriceAfterInsert +=
+          item.quantity * item.productId.priceAfterDiscount;
+      });
+
+      cart.totalPrice = totalPriceAfterInsert - totalDiscountPriceAfterInsert;
+
+      await cart.save();
+      if (isElse) {
+     return cart
+      }else{
       return {
-          statusCode: 200,
-          message: 'سبد خرید با موفقیت به روز شد',
-          cart: updateCartAndAddProduct,
-        };
+        statusCode: 200,
+        message: 'محصول با موفقیت به سبد خرید اضافه شد',
+        cart: cart,
+      }
     }
-  
-    else{
+    } else {
 
-      const newCart =await (await this.cartModel.create({
-        cartItems: [
-          {
-            productId: productId
-          },
-        ],
-        totalPrice: product?.price - product.priceAfterDiscount,
+      await this.cartModel.create({
+        cartItems: [],
+        totalPrice: 0,
         user: userId,
-      })).populate('cartItems.productId' , 'title description price  priceAfterDiscount _id');
+      })
+      const insertProduct = await this.create(productId, userId,isElse= true);
       return {
           statusCode: 201,
           message: 'سبد خرید جدید با موفقیت ایجاد شد',
-          cart: newCart,
+          cart: insertProduct,
         }
     }
   }
@@ -96,8 +95,11 @@ export class CartService {
     return `This action returns all cart`;
   }
 
+
   async findOne(userId: string) {
-    const cart = await this.cartModel.findOne({ user: userId }).select('-__v')
+    const cart = await this.cartModel.findOne({ user: userId })
+    .populate('cartItems.productId', 'title price priceAfterDiscount _id')
+    .select('-__v')
     if (!cart) {
       throw new NotFoundException('سبد خرید یافت نشد');
     }
@@ -130,32 +132,38 @@ export class CartService {
       cart.cartItems[indexProductUpdate].color = updateCartItemsDto.color;
     }
 
+    if (updateCartItemsDto.quantity > product.quantity) {
+      throw new HttpException('تعداد محصول باید کمتر یا مساوی  موجودی باشد', 400);
+    }
 
-    let totalPrice =0
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    let totalPriceAfterUpdate = 0;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    let totalDiscountPriceAfterUpdate = 0;
+
+
     if (updateCartItemsDto.quantity) {
       cart.cartItems[indexProductUpdate].quantity = updateCartItemsDto.quantity;
-     cart.cartItems.map((item) => {
-        totalPrice += (item.productId.price * item.quantity) - item.productId.priceAfterDiscount * item.quantity;
+      cart.cartItems.map((item) => {
+
+        totalPriceAfterUpdate += item.quantity * item.productId.price;
+        totalDiscountPriceAfterUpdate +=
+          item.quantity * item.productId.priceAfterDiscount;
       });
-      cart.totalPrice = totalPrice;
+
+      cart.totalPrice = totalPriceAfterUpdate - totalDiscountPriceAfterUpdate;
+
     }
 
-    const updatedCart = await this.cartModel.findOneAndUpdate(
-      { user: userId },
-      {
-        cartItems: cart.cartItems,
-        totalPrice: cart.totalPrice,
-      },
-      { new: true },
-    ).populate('cartItems.productId', 'title description price  priceAfterDiscount _id');
-    
+    await cart.save();
+
     return {
       statusCode: 200,
-      message: 'سبد خرید با موفقیت به روز شد',
-      cart: updatedCart,
+      message: 'محصول با موفقیت به سبد خرید به روز رسانی شد',
+      cart: cart,
     }
   }
-
 
 
   async remove(productId: string, userId: string) {
@@ -179,13 +187,17 @@ export class CartService {
    cart.cartItems = cart.cartItems.filter((_, index) => index !== indexProductDelete);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    let totalPrice = 0;
-    cart.cartItems.map((item) => {
-      totalPrice += item.quantity * item.productId?.price;
-    });
+    let totalPriceAfterUpdate = 0;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    let totalDiscountPriceAfterUpdate = 0;
 
-    cart.totalPrice = totalPrice;
+      cart.cartItems.map((item) => {
+        totalPriceAfterUpdate += item.quantity * item.productId.price;
+        totalDiscountPriceAfterUpdate +=
+          item.quantity * item.productId.priceAfterDiscount;
+      });
 
+      cart.totalPrice = totalPriceAfterUpdate - totalDiscountPriceAfterUpdate;
 
     await cart.save();
 
@@ -196,8 +208,38 @@ export class CartService {
     };
   }
 
-  async applyCoupons(id: string, coupons: string[]) {
+  async applyCoupon(userId: string, couponName: string) {
+    const cart = await this.cartModel.findOne({ user: userId });
 
-    return `Coupons applied: ${coupons.join(', ')}, new total price`;
+    if (!cart) {
+      throw new HttpException('سبد خرید یافت نشد', 404);
+    }
+
+    const coupon = await this.couponModel.findOne({ name: couponName });
+    if (!coupon) {
+      throw new HttpException('کوپن یافت نشد', 404);
+    }
+    const isExpired = new Date(coupon.expireDate) > new Date();
+    if (!isExpired) {
+      throw new HttpException('کوپن منقضی شده است', 400);
+    }
+
+    const ifCouponAlreadyUsed = cart.coupons.findIndex(coupon => coupon.name === couponName);
+    if (ifCouponAlreadyUsed !== -1) {
+      throw new HttpException('کوپن قبلاً استفاده شده است', 400);
+    }
+
+    if (cart.totalPrice <= 0) {
+      throw new HttpException('حداقل مبلغ برای استفاده از کوپن رعایت نشده است', 400);
+    }
+
+    cart.coupons.push({name: coupon.name, couponId: coupon._id.toString() });
+    cart.totalPrice = cart.totalPrice - coupon.discount;
+    await cart.save();
+    return {
+      statusCode: 200,
+      message: 'کوپن با موفقیت اعمال شد',
+      cart: cart,
+    }
   }
 }

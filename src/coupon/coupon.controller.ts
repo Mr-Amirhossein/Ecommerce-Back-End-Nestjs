@@ -8,6 +8,7 @@ import {
   UseGuards,
   ValidationPipe,
   Put,
+  HttpException,
 } from '@nestjs/common';
 import { CouponService } from './coupon.service';
 import { CreateCouponDto } from './dto/create-coupon.dto';
@@ -47,6 +48,10 @@ export class CouponController {
     )
     createCouponDto: CreateCouponDto,
   ) {
+    const isExpired = new Date(createCouponDto.expireDate) < new Date();
+    if (isExpired) {
+      throw new HttpException('تاریخ انقضای کوپن باید بزرگتر از تاریخ فعلی باشد.', 400);
+    }
     return await this.couponService.create(createCouponDto);
   }
 
@@ -103,6 +108,12 @@ export class CouponController {
     )
     updateCouponDto: UpdateCouponDto,
   ) {
+    if (updateCouponDto.expireDate) {
+      const isExpired = new Date(updateCouponDto.expireDate) < new Date();
+      if (isExpired) {
+        throw new HttpException('تاریخ انقضای کوپن باید بزرگتر از تاریخ فعلی باشد.', 400);
+      }
+    }
     return await this.couponService.update(id, updateCouponDto);
   }
 

@@ -28,7 +28,7 @@ export class Coupon {
     min: [0, 'درصد تخفیف باید حداقل 0 باشد'],
   })
   @ApiProperty({ example: 20 })
-  disCount: number;
+  discount: number;
 }
 
 export const couponSchema = SchemaFactory.createForClass(Coupon);

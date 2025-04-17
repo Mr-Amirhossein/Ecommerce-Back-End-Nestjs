@@ -49,6 +49,22 @@ export class CartController {
     return await this.cartService.findAll();
   }
 
+  //  @docs   Can Only User Apply Coupons
+  //  @Route  POST /api/v1/cart/coupon
+  //  @access Private [User]
+  @Roles(['user'])
+  @UseGuards(AuthGuard)
+  @Post('/coupon/:couponName')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'اعمال کد تخفیف' })
+  applyCoupon(@Param('couponName') couponName: string, @Req() req) {
+    // if (req.user.role.toLowerCase() === 'admin') {
+    //   throw new UnauthorizedException();
+    // }
+    const userId = req.user.id;
+    return this.cartService.applyCoupon(userId, couponName);
+  }
+
   // docs Get One Cart
   // Route Get /api/v1/cart/single/:id
   // Access private [user]
@@ -111,28 +127,6 @@ export class CartController {
     const userId = req.user.id; // Assuming the user ID is stored in req.user._id
     return await this.cartService.remove(productId , userId);
 
-  }
-  // docs User Can Apply Coupons
-  // Route Put /api/v1/cart/apply-coupons/:id
-  // Access private [user]
-  @Roles(['user'])
-  @UseGuards(AuthGuard)
-  @Put('apply-coupons/:id')
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'اعمال کد تخفیف' })
-  @ApiCreatedResponse({
-    type: CreateCartDto,
-    description: 'کد تخفیف با موفقیت اعمال شد.',
-  })
-
-  async applayCoupons(@Param('id') id: string, @Body(
-    new ValidationPipe({
-      forbidNonWhitelisted: true,
-      whitelist: true,
-    }),
-  
-  ) coupons: string[]) {
-    return await this.cartService.applyCoupons(id, coupons);
   }
 
 }

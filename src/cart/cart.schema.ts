@@ -68,7 +68,7 @@ export class Cart {
   coupons: [
     {
       name: string;
-      couponId: number;
+      couponId: string;
     }
   ];
 

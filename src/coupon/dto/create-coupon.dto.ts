@@ -27,5 +27,5 @@ export class CreateCouponDto {
   })
   @IsNumber({}, { message: 'درصد تخفیف باید یک عدد باشد' })
   @ApiProperty({ example: 20 })
-  disCount: number;
+  discount: number;
 }
