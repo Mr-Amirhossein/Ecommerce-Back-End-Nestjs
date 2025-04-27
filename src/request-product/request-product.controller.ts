@@ -53,9 +53,9 @@ export class RequestProductController {
     createRequestProductDto: CreateRequestProductDto,
     @Req() req,
   ) {
-    if (req.user.role.toLowerCase() === 'admin') {
-      throw new UnauthorizedException();
-    }
+    // if (req.user.role.toLowerCase() === 'admin') {
+    //   throw new UnauthorizedException();
+    // }
 
     return await this.requestProductService.create({
       ...createRequestProductDto,

@@ -19,7 +19,7 @@ export class TaxService {
       return{
        statusCode: 200,
        message: 'مالیات با موفقیت ایجاد شد',
-       data: createTaxDto,
+       data: newTax,
       }
      }
 

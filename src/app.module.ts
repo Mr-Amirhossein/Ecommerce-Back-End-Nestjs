@@ -17,12 +17,13 @@ import { TaxModule } from './tax/tax.module';
 import { ReviewModule } from './review/review.module';
 import { CartModule } from './cart/cart.module';
 import { CartAdminModule } from './cart-admin/cart-admin.module';
+import { OrderModule } from './order/order.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     MongooseModule.forRoot(
-      'mongodb://root:9kvixZkHtvf9V2Pz4tAfAkzy@alvand.liara.cloud:30112/ecommerce?authSource=admin',
+      'mongodb://root:srw48VMa4KStq4pHlb2HseC9@alvand.liara.cloud:33621/ecommerce?authSource=admin',
     ),
     AuthModule,
     UserModule,
@@ -50,6 +51,7 @@ import { CartAdminModule } from './cart-admin/cart-admin.module';
     TaxModule,
     ReviewModule,
     CartModule,
+    OrderModule,
     // CartAdminModule,
   ],
   controllers: [],

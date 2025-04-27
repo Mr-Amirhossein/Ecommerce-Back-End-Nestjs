@@ -31,6 +31,7 @@ export class SuppliersService {
     return {
       statusCode: 200,
       message: 'تامین کنندگان با موفقیت بازیابی شدند',
+      length: suppliers.length,
       data: suppliers,
     };
   }
